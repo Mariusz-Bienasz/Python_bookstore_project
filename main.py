@@ -7,6 +7,6 @@ if __name__ == '__main__':
     # window = ctk.CTk()
     # window.attributes("-fullscreen", True)
     # window.bind("<Escape>", lambda event: window.attributes("-fullscreen", False))
-    # window.geometry("900x900")
+    # window.geometry("1000x700")
     # DashboardInterface.makeDashboard(window)
     # window.mainloop()

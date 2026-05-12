@@ -3,8 +3,7 @@
 '''
 
 To do:
--kolory
--odstępy
+
 -podpięcie funkcji (na koniec)
 
 '''
@@ -26,10 +25,10 @@ def numbersCheck(txt):
             true lub false w zależności od wyniku sprawdzenia
     '''
 
-    return txt == "" or txt.isdigit()
+    return txt == "" or txt.isdigit() or txt == "Podaj numer id książki"
 
 
-def register(login, email, phone, password, passwordAgain, errorLabel):
+def register(name, surname, email, phone, password, passwordAgain, errorLabel):
     '''
             Funkcja do podłączenia rejestracji
 
@@ -40,7 +39,8 @@ def register(login, email, phone, password, passwordAgain, errorLabel):
                 Brak
         '''
 
-    login = login.strip()
+    name = name.strip()
+    surname = surname.strip()
     email = email.strip()
     phone = phone.strip()
 
@@ -52,10 +52,10 @@ def register(login, email, phone, password, passwordAgain, errorLabel):
 
     date = datetime.now().strftime("%d.%m.%Y")
 
-    errorLabel.configure(text=f"Login: {login} \nEmail: {email} \nPhone: {phone} \nPassword: {password} \nPassword Again: {passwordAgain} \nDate: {date}")
-    print(f"Login: {login} \nEmail: {email} \nPhone: {phone} \nPassword: {password} \nPassword Again: {passwordAgain} \nDate: {date}")
+    errorLabel.configure(text=f"Name: {name} \nSurname: {surname} \nEmail: {email} \nPhone: {phone} \nPassword: {password} \nPassword Again: {passwordAgain} \nDate: {date}")
+    print(f"Name: {name} \nSurname: {surname} \nEmail: {email} \nPhone: {phone} \nPassword: {password} \nPassword Again: {passwordAgain} \nDate: {date}")
 
-def login(login, password, errorLabel):
+def login(email, password, errorLabel):
     '''
         Funkcja do podłączenia logowania
 
@@ -67,12 +67,12 @@ def login(login, password, errorLabel):
     '''
 
     # usuwam spacje na poczatku i końcu zmiennych
-    login = login.strip()
+    email = email.strip()
     password = password.strip()
     # zabezpieczam hasło szyfrowaniem typu hash
     password = hashlib.sha256(password.encode('utf-8')).hexdigest()
 
-    errorLabel.configure(text=f"Login: {login} \nPassword: {password}")
+    errorLabel.configure(text=f"E-mail: {email} \nPassword: {password}")
     print(f"Login: {login} \nPassword: {password}")
 
 
@@ -107,7 +107,7 @@ def makeLoginInterface(window):
     phoneValidate = (window.register(numbersCheck), '%P')
 
     # Nagłówek
-    header = ctk.CTkFrame(window, fg_color="#DCDCDC", corner_radius=0, height=80)
+    header = ctk.CTkFrame(window, fg_color="#001524", corner_radius=0, height=80)
     header.pack_propagate(False)  # blokowanie zmiany rozmiaru
     header.pack(side="top", fill="x")
 
@@ -115,11 +115,11 @@ def makeLoginInterface(window):
     appNameLabel = ctk.CTkLabel(
         header,
         text="Internetowa Księgarnia",
-        font=("arial", 16, "bold"),
-        text_color="#3498db",
-        fg_color="#DCDCDC")
+        font=("arial", 20, "bold"),
+        text_color="#3a86ff",
+        fg_color="transparent")
 
-    appNameLabel.pack(side="left", padx=10, pady=5)
+    appNameLabel.pack(side="left", padx=30, pady=10)
 
 
     # przycisk do zamykania aplikacji
@@ -131,9 +131,9 @@ def makeLoginInterface(window):
         width=50,
         height=50,
         fg_color="transparent",
-        text_color="#334155",
+        text_color="#3a86ff",
         hover_color="#E69A9A",
-        font=("arial", 16, "bold"),
+        font=("arial", 20, "bold"),
         command=window.destroy
     )
     closeButton.pack(side="right", padx=10, pady=5)
@@ -146,19 +146,26 @@ def makeLoginInterface(window):
         text="Powrót do sklepu",
         command = lambda: openDashboardInterface(window),
         fg_color="transparent",
-        text_color="#334155",
-        hover_color="#C8C8C8")
+        width=150,
+        height=50,
+        text_color="#3a86ff",
+        font=("arial", 20, "bold"),
+        hover_color="#002B4A")
 
     backButton.pack(side="right", padx=10, pady=5)
 
     # główna sekcja
-    mainBox = ctk.CTkFrame(window, fg_color="#DCDCDC", corner_radius=0)
+    mainBox = ctk.CTkScrollableFrame(window, fg_color="#001524", corner_radius=0)
     mainBox.pack(side="top", fill="both", expand=True)
 
     # wrapper
 
     wrapper = ctk.CTkFrame(mainBox, fg_color="transparent")
-    wrapper.pack(expand=True)
+    wrapper.pack(expand=True , pady=(60,30))
+
+
+    #######################################################################
+
 
     ## LOGOWANIE:
 
@@ -167,10 +174,11 @@ def makeLoginInterface(window):
     loginBox = ctk.CTkFrame(
         wrapper,
         width=350,
-        height=650,
+        height=750,
         border_width=2,
         corner_radius=15,
-        fg_color="#FFFFFF")
+        border_color="#3B82F6",
+        fg_color="#1E293B")
 
     loginBox.pack_propagate(False)
     loginBox.pack(side="left", padx=20, pady=10)
@@ -179,33 +187,35 @@ def makeLoginInterface(window):
     formNameLabel = ctk.CTkLabel(
         loginBox,
         text="Logowanie",
-        font=("arial", 16, "bold"),
-        text_color="#3498db",
+        font=("arial", 25, "bold"),
+        text_color="#F8FAFC",
         fg_color="transparent")
 
-    formNameLabel.pack(side="top", pady=10)
+    formNameLabel.pack(side="top", pady=(30,90))
 
     # napis Podaj login
-    loginLabel = ctk.CTkLabel(
+    emailLoginLabel = ctk.CTkLabel(
         loginBox,
-        text="Podaj nazwę konta: ",
+        text="Podaj e-mail: ",
         font=("arial", 16, "bold"),
-        text_color="#000000",
+        text_color="#F8FAFC",
         fg_color="transparent")
 
-    loginLabel.pack(side="top", pady=20)
+    emailLoginLabel.pack(side="top", pady=20)
 
     # input dla loginu
-    loginEntry = ctk.CTkEntry(
+    emailLoginEntry = ctk.CTkEntry(
         loginBox,
         width=250,
         height=40,
         fg_color="transparent",
-        text_color="#000000",
+        text_color="#F8FAFC",
+        font=("arial", 16, "bold"),
         border_width=2,
+        border_color="#3B82F6",
         corner_radius=20)
 
-    loginEntry.pack(side="top")
+    emailLoginEntry.pack(side="top")
 
     # napis Podaj hasło
 
@@ -213,7 +223,7 @@ def makeLoginInterface(window):
         loginBox,
         text="Podaj Hasło: ",
         font=("arial", 16, "bold"),
-        text_color="#000000",
+        text_color="#F8FAFC",
         fg_color="transparent")
 
     passwordLabel.pack(side="top", pady=20)
@@ -226,8 +236,10 @@ def makeLoginInterface(window):
         width=250,
         height=40,
         fg_color="transparent",
-        text_color="#000000",
+        text_color="#F8FAFC",
+        font=("arial", 16, "bold"),
         border_width=2,
+        border_color="#3B82F6",
         corner_radius=20)
 
     passwordEntry.pack(side="top")
@@ -239,13 +251,22 @@ def makeLoginInterface(window):
         text="Zaloguj!",
         border_width=2,
         corner_radius=10,
-        border_color="#000000",
-        hover_color="#C8C8C8",
-        text_color="#000000",
+        border_color="#3B82F6",
+        width=200,
+        height=50,
+        hover_color="#1E3A8A",
+        text_color="#F8FAFC",
         fg_color="transparent",
-        command = lambda: login(loginEntry.get(), passwordEntry.get(), errorLabel))
+        font=("arial", 20, "bold"),
+        command = lambda: login(emailLoginEntry.get(), passwordEntry.get(), errorLabel))
 
-    loginButton.pack(side="top", pady=20)
+    loginButton.pack(side="top", pady=70)
+
+
+
+
+    ################################################################################
+
 
 
     ## REJESTRACJA:
@@ -255,10 +276,11 @@ def makeLoginInterface(window):
     registerBox = ctk.CTkFrame(
         wrapper,
         width=350,
-        height=650,
+        height=750,
         border_width=2,
         corner_radius=15,
-        fg_color="#FFFFFF")
+        border_color="#3B82F6",
+        fg_color="#1E293B")
 
     registerBox.pack_propagate(False)
     registerBox.pack(side="left", padx=20, pady=10)
@@ -268,35 +290,66 @@ def makeLoginInterface(window):
     formNameLabel = ctk.CTkLabel(
         registerBox,
         text="Rejestracja",
-        font=("arial", 16, "bold"),
-        text_color="#3498db",
+        font=("arial", 25, "bold"),
+        text_color="#F8FAFC",
         fg_color="transparent")
 
-    formNameLabel.pack(side="top", pady=10)
+    formNameLabel.pack(side="top", pady=30)
+
 
     # Napis 'Podaj nazwę konta:'
 
-    loginRegisterLabel = ctk.CTkLabel(
+    nameRegisterLabel = ctk.CTkLabel(
         registerBox,
-        text="Podaj nazwę konta: ",
+        text="Podaj imię: ",
         font=("arial", 16, "bold"),
-        text_color="#000000",
-        fg_color="transparent")
+        text_color="#F8FAFC",
+        fg_color="transparent"
+    )
 
-    loginRegisterLabel.pack(side="top", pady=10)
+    nameRegisterLabel.pack(side="top", pady=10)
 
     # input loginu
 
-    loginRegisterEntry = ctk.CTkEntry(
+    nameRegisterEntry = ctk.CTkEntry(
         registerBox,
         width=250,
         height=40,
         fg_color="transparent",
-        text_color="#000000",
+        text_color="#F8FAFC",
+        font=("arial", 16, "bold"),
         border_width=2,
+        border_color="#3B82F6",
         corner_radius=20)
 
-    loginRegisterEntry.pack(side="top")
+    nameRegisterEntry.pack(side="top")
+
+    # Napis 'Podaj nazwisko:'
+
+    surnameRegisterLabel = ctk.CTkLabel(
+        registerBox,
+        text="Podaj nazwisko: ",
+        font=("arial", 16, "bold"),
+        text_color="#F8FAFC",
+        fg_color="transparent"
+    )
+
+    surnameRegisterLabel.pack(side="top", pady=10)
+
+    # input loginu
+
+    surnameRegisterEntry = ctk.CTkEntry(
+        registerBox,
+        width=250,
+        height=40,
+        fg_color="transparent",
+        text_color="#F8FAFC",
+        font=("arial", 16, "bold"),
+        border_width=2,
+        border_color="#3B82F6",
+        corner_radius=20)
+
+    surnameRegisterEntry.pack(side="top")
 
     # napis 'Podaj e-mail:'
 
@@ -304,7 +357,7 @@ def makeLoginInterface(window):
         registerBox,
         text="Podaj e-mail: ",
         font=("arial", 16, "bold"),
-        text_color="#000000",
+        text_color="#F8FAFC",
         fg_color="transparent")
 
     emailRegisterLabel.pack(side="top", pady=10)
@@ -316,8 +369,10 @@ def makeLoginInterface(window):
         width=250,
         height=40,
         fg_color="transparent",
-        text_color="#000000",
+        text_color="#F8FAFC",
+        font=("arial", 16, "bold"),
         border_width=2,
+        border_color="#3B82F6",
         corner_radius=20)
 
     emailRegisterEntry.pack(side="top")
@@ -328,7 +383,7 @@ def makeLoginInterface(window):
         registerBox,
         text="Podaj numer telefonu: ",
         font=("arial", 16, "bold"),
-        text_color="#000000",
+        text_color="#F8FAFC",
         fg_color="transparent")
 
     phoneRegisterLabel.pack(side="top", pady=10)
@@ -340,8 +395,10 @@ def makeLoginInterface(window):
         width=250,
         height=40,
         fg_color="transparent",
-        text_color="#000000",
+        text_color="#F8FAFC",
+        font=("arial", 16, "bold"),
         border_width=2,
+        border_color="#3B82F6",
         corner_radius=20,
         validate="key",
         validatecommand=phoneValidate)
@@ -354,7 +411,7 @@ def makeLoginInterface(window):
         registerBox,
         text="Podaj hasło: ",
         font=("arial", 16, "bold"),
-        text_color="#000000",
+        text_color="#F8FAFC",
         fg_color="transparent")
 
     passwordRegisterLabel.pack(side="top", pady=10)
@@ -367,8 +424,10 @@ def makeLoginInterface(window):
         width=250,
         height=40,
         fg_color="transparent",
-        text_color="#000000",
+        text_color="#F8FAFC",
+        font=("arial", 16, "bold"),
         border_width=2,
+        border_color="#3B82F6",
         corner_radius=20)
 
     passwordRegisterEntry.pack(side="top")
@@ -380,7 +439,7 @@ def makeLoginInterface(window):
         registerBox,
         text="powtórz hasło: ",
         font=("arial", 16, "bold"),
-        text_color="#000000",
+        text_color="#F8FAFC",
         fg_color="transparent")
 
     passwordRegisterLabel.pack(side="top", pady=10)
@@ -394,8 +453,10 @@ def makeLoginInterface(window):
         width=250,
         height=40,
         fg_color="transparent",
-        text_color="#000000",
+        text_color="#F8FAFC",
+        font=("arial", 16, "bold"),
         border_width=2,
+        border_color="#3B82F6",
         corner_radius=20)
 
     passwordAgainRegisterEntry.pack(side="top")
@@ -406,13 +467,17 @@ def makeLoginInterface(window):
         registerBox,
         text="Zarejestruj!",
         border_width=2,
+        width=200,
+        height=50,
         corner_radius=10,
-        border_color="#000000",
-        hover_color="#C8C8C8",
-        text_color="#000000",
+        border_color="#3B82F6",
+        hover_color="#1E3A8A",
+        text_color="#F8FAFC",
         fg_color="transparent",
+        font=("arial", 20, "bold"),
         command = lambda: register(
-            loginRegisterEntry.get(),
+            nameRegisterEntry.get(),
+            surnameRegisterEntry.get(),
             emailRegisterEntry.get(),
             phoneRegisterEntry.get(),
             passwordRegisterEntry.get(),
@@ -420,7 +485,7 @@ def makeLoginInterface(window):
             errorLabel)
     )
 
-    registerButton.pack(side="top", pady=20)
+    registerButton.pack(side="bottom", pady=(0,30))
 
 
     # Label do wyświetlania błędów
@@ -429,8 +494,9 @@ def makeLoginInterface(window):
         mainBox,
         text="",
         font=("arial", 16, "bold"),
-        text_color="red",
-        fg_color="transparent")
+        text_color="#d62828",
+        fg_color="transparent"
+    )
 
     errorLabel.pack(side="bottom", pady=30)
 
