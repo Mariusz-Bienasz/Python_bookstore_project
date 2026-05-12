@@ -164,7 +164,7 @@ def makeBookInterface(window, bookId):
     ##################################################################################################################################
 
     #wyciąganie danych z pliku
-    data = pd.read_excel("DATABASE/bookNew.xlsx")
+    data = pd.read_excel("DATABASE/book.xlsx")
     # jedna konkretna ksiązka
     book = data[data['ID'] == bookId]
 
