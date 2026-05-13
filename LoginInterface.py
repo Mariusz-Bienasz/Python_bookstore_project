@@ -4,7 +4,7 @@
 
 To do:
 
--podpięcie funkcji (na koniec)
+-podpiąć funkcje logowania
 
 '''
 
@@ -12,6 +12,10 @@ from datetime import datetime
 import customtkinter as ctk
 import DashboardInterface
 import hashlib
+import re
+
+import GlobalVariables
+import customer_module
 
 
 def numbersCheck(txt):
@@ -30,7 +34,7 @@ def numbersCheck(txt):
 
 def register(name, surname, email, phone, password, passwordAgain, errorLabel):
     '''
-            Funkcja do podłączenia rejestracji
+            Funkcja do podłączenia rejestracji i walidacja inputów
 
             Args:
                 login, email, phone, password, passwordAgain: wartości jakie podał użytkownik
@@ -39,10 +43,17 @@ def register(name, surname, email, phone, password, passwordAgain, errorLabel):
                 Brak
         '''
 
+    error = False
+    errorTxt = ''
     name = name.strip()
     surname = surname.strip()
     email = email.strip()
     phone = phone.strip()
+
+    emailPattern = r'^[\w.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+
+
+    # szyfrowanie hasła
 
     password = password.strip()
     password = hashlib.sha256(password.encode('utf-8')).hexdigest()
@@ -50,10 +61,54 @@ def register(name, surname, email, phone, password, passwordAgain, errorLabel):
     passwordAgain = passwordAgain.strip()
     passwordAgain = hashlib.sha256(passwordAgain.encode('utf-8')).hexdigest()
 
-    date = datetime.now().strftime("%d.%m.%Y")
 
-    errorLabel.configure(text=f"Name: {name} \nSurname: {surname} \nEmail: {email} \nPhone: {phone} \nPassword: {password} \nPassword Again: {passwordAgain} \nDate: {date}")
-    print(f"Name: {name} \nSurname: {surname} \nEmail: {email} \nPhone: {phone} \nPassword: {password} \nPassword Again: {passwordAgain} \nDate: {date}")
+    # Walidacja danych:
+
+    if name == "":
+        error = True
+        errorTxt += 'Pole imie nie może być puste \n'
+
+    if surname == "":
+        error = True
+        errorTxt += 'Pole nazwisko nie może być puste \n'
+
+    if email == "":
+        error = True
+        errorTxt += 'Pole email nie może być puste \n'
+
+    if not re.match(emailPattern, email):
+        error = True
+        errorTxt += 'W polu email jest błąd \n'
+
+    if phone == "":
+        phone="NULL"
+
+    if phone != "" and len(phone) != 9:
+        error = True
+        errorTxt += 'Numer telefonu musi mieć 9 cyfr \n'
+
+    if password == "" or passwordAgain == "":
+        error = True
+        errorTxt += 'Pole hasło nie może być puste \n'
+
+    if password != passwordAgain:
+        error = True
+        errorTxt += 'Hasła nie są takie same\n'
+
+    errorLabel.configure(text=errorTxt)
+
+
+    if error == False:
+        data = customer_module.register_customer(name,surname, password, email, phone)
+        if data != None:
+            GlobalVariables.isLoggedIn = True
+            GlobalVariables.userID = data["ID"]
+            errorLabel.configure(text="Udało ci się zarejestrować", text_color="#00FF00")
+        else:
+            errorLabel.configure(text="Coś poszło nie tak")
+
+
+    print(f"Name: {name} \nSurname: {surname} \nEmail: {email} \nPhone: {phone} \nPassword: {password} \nPassword Again: {passwordAgain} \n")
 
 def login(email, password, errorLabel):
     '''
@@ -72,8 +127,30 @@ def login(email, password, errorLabel):
     # zabezpieczam hasło szyfrowaniem typu hash
     password = hashlib.sha256(password.encode('utf-8')).hexdigest()
 
-    errorLabel.configure(text=f"E-mail: {email} \nPassword: {password}")
-    print(f"Login: {login} \nPassword: {password}")
+    error = False
+    errorTxt = ''
+    emailPattern = r'^[\w.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+
+
+    if  email == "":
+        error = True
+        errorTxt += "Pole e-mail nie może być puste \n"
+    if not re.match(emailPattern, email):
+        error = True
+        errorTxt +=  "W polu e-mail jest błąd \n"
+    if password == "":
+        error = True
+        errorTxt += "Pole hasło nie może być puste"
+
+    errorLabel.configure(text=errorTxt)
+
+    if error == False:
+        # if customer_module.login_customer() == True:
+        #     print(f"Login: {login} \nPassword: {password}")
+        #     errorLabel.configure(text="Udało ci się zalogować", text_color="#00FF00")
+        # else:
+        #     errorLabel.configure(text="Coś poszło nie tak/Błędny e-mail lub hasło")
+        return
 
 
 
