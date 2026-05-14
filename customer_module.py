@@ -5,33 +5,52 @@ import os
 import GlobalVariables
 
 
-def register_customer(name: str, surname: str, password: str, email: str = "NULL", phone: str = "NULL") -> dict:
+def register_customer(name: str, surname: str, password: str, email: str = "NULL", phone: str = "NULL") -> tuple:
     """
     Funkcja rejestrująca nowego klienta księgarni.
-    Generuje ID, tworzy plik historii i dopisuje klienta do bazy customer.csv z hasłem.
+    Generuje unikalne ID, sprawdza czy email nie jest zajęty i dopisuje dane do pliku CSV.
+
+    Args:
+        name (str): Imię klienta.
+        surname (str): Nazwisko klienta.
+        password (str): Hasło klienta do systemu.
+        email (str, optional): Adres e-mail. Domyślnie "NULL".
+        phone (str, optional): Numer telefonu. Domyślnie "NULL".
+
+    Returns:
+        tuple: Krotka (bool, str). Zwraca True i komunikat o sukcesie przy udanej rejestracji,
+               lub False i komunikat o błędzie (np. gdy e-mail jest już zajęty).
     """
+    try:
+        df = pd.read_csv('DATABASE/customer.csv')
+        zajete_id = df['ID'].astype(str).tolist()
 
-    # 1. Zagnieżdżona funkcja losująca ID
+        # Pobieramy listę e-maili z bazy
+        # Wyciągamy kolumnę 'E-MAIL', zamieniamy na tekst i robimy z tego listę Pythona
+        zajete_emaile = df['E-MAIL'].astype(str).tolist()
+    except FileNotFoundError:
+        zajete_id = []
+        zajete_emaile = []  # Jeśli nie ma pliku, lista maili jest pusta
+
+    #Sprawdzanie unikalności E-MAILA
+    # Jeśli klient podał maila (czyli nie jest to domyślne "NULL") i ten mail
+    # znajduje się na naszej liście 'zajete_emaile', to przerywamy rejestrację.
+    if email != "NULL" and email in zajete_emaile:
+        # Zwracamy False oraz gotowy tekst błędu
+        return False, "Błąd: Podany e-mail jest już przypisany do innego konta!"
+
+    # Zagnieżdżona funkcja losująca ID
     def generate_unique_id() -> str:
-        try:
-            # Wczytujemy bazę, żeby zobaczyć zajęte ID
-            df = pd.read_csv('DATABASE/customer.csv')
-            zajete_id = df['ID'].astype(str).tolist()
-        except FileNotFoundError:
-            zajete_id = []
-
         while True:
-            # Losujemy tak długo, aż trafimy na numer, którego nie ma na liście "zajete_id"
             nowe_id = str(random.randint(1000, 9999))
             if nowe_id not in zajete_id:
                 return nowe_id
-
 
     customer_id = generate_unique_id()
     full_name = f"{name} {surname}"
     dzisiejsza_data = datetime.now().strftime('%Y-%m-%d')
 
-    # 2. Tworzenie pliku tekstowego z historią (To, co napisaliśmy wcześniej)
+    # Tworzenie pliku tekstowego z historią
     try:
         file_path = f"DATABASE/{customer_id}.txt"
         with open(file_path, 'w', encoding='utf-8') as file:
@@ -39,13 +58,10 @@ def register_customer(name: str, surname: str, password: str, email: str = "NULL
             file.write(f"Konto utworzone: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             file.write("-" * 50 + "\n")
     except Exception as e:
-        print(f"Błąd przy tworzeniu pliku TXT: {e}")
-        return None
+        return False, f"Błąd przy tworzeniu pliku z historią: {e}"
 
-    # 3. Dodawanie danych do pliku customer.csv za pomocą Pandas
+    # Dodawanie danych do pliku customer.csv za pomocą Pandas
     try:
-        # Tworzymy "słownik" z danymi nowego klienta.
-        # Nazwy kluczy (po lewej) MUSZĄ zgadzać się z nagłówkami w waszym pliku customer.csv
         new_customer_data = {
             'ID': [customer_id],
             'NAME': [full_name],
@@ -56,141 +72,157 @@ def register_customer(name: str, surname: str, password: str, email: str = "NULL
             'UPDATED': [dzisiejsza_data]
         }
 
-        # Konwertujemy nasz słownik na DataFrame (tabelkę Pandas)
         new_row_df = pd.DataFrame(new_customer_data)
-
-        # Dopisujemy nasz nowy wiersz na sam dół pliku customer.csv
-        # mode='a' oznacza "append" (dopisz na końcu, nie kasuj starych danych!)
-        # header=False oznacza, żeby nie wpisywał drugi raz nazw kolumn
-        # index=False usuwa domyślną numerację wierszy z Pandasa
         new_row_df.to_csv('DATABASE/customer.csv', mode='a', header=False, index=False)
 
-        print(f"Sukces! Dodano klienta {full_name} do bazy customer.csv.")
-
     except Exception as e:
-        print(f"Błąd podczas dopisywania do CSV: {e}")
-        return None
+        return False, f"Błąd podczas zapisu do bazy danych CSV: {e}"
 
-    # Opcjonalnie w przyszłości można dopisać podobny blok dla address.csv!
+    # REJESTRACJA UDANA! Zwracamy True oraz ładny komunikat z nowym ID
+    return True, f"Rejestracja udana! Twoje nowo wygenerowane ID to: {customer_id}"
 
-    # Funkcja zwraca dane, na wypadek gdyby jakaś inna część programu ich potrzebowała
-    return {"ID": customer_id, "NAME": full_name}
 
 # test
 #register_customer("Adam", "Nowak", "adam@test.pl", "123456789")
 
+# Usuwanie klienta
+def delete_customer(identifier: str, by_id: bool = True) -> tuple:
+    """
+    Funkcja usuwająca klienta z bazy CSV oraz usuwająca jego plik z historią.
+
+    Args:
+        identifier (str): ID klienta lub jego Imię i Nazwisko.
+        by_id (bool, optional): Flaga decydująca o sposobie szukania.
+                                True szuka po ID, False po Nazwisku. Domyślnie True.
+
+    Returns:
+        tuple: Krotka (bool, str). Zwraca True i komunikat o sukcesie przy usunięciu,
+               lub False i komunikat o błędzie, gdy klient nie istnieje.
+    """
+    try:
+        df = pd.read_csv('DATABASE/customer.csv')
+        initial_count = len(df)
+
+        if by_id:
+            df = df[df['ID'].astype(str) != str(identifier)]
+        else:
+            df = df[df['NAME'] != str(identifier)]
+
+        if len(df) == initial_count:
+            # Jeśli ilość wierszy przed i po usunięciu jest taka sama, to nikogo nie znaleźliśmy
+            return False, f"Błąd: Nie znaleziono klienta '{identifier}' w bazie!"
+
+        df.to_csv('DATABASE/customer.csv', index=False)
+
+        # Jeśli usuwamy po ID, to fizycznie kasujemy też plik z dysku
+        if by_id:
+            file_path = f"DATABASE/{identifier}.txt"
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        # Zwracamy sukces dla interfejsu
+        return True, f"Sukces: Pomyślnie usunięto klienta '{identifier}' z systemu."
+
+    except FileNotFoundError:
+        return False, "Błąd: Nie znaleziono głównego pliku bazy danych (customer.csv)!"
+    except Exception as e:
+        return False, f"Wystąpił nieoczekiwany błąd podczas usuwania: {e}"
 
 # Zakup książki i Dekorator (Funkcja wyższego rzędu)
 
-def allow_multiple_books(func):
+def buy_book(customer_id: str, *books) -> tuple:
     """
-    Dekorator (funkcja wyższego rzędu).
-    Pozwala funkcji realizującej zakup jednej książki przyjmować wiele ID książek naraz.
-    """
+    Funkcja realizująca zakup książek.
+    Przyjmuje dowolną liczbę ID książek i wpisuje je do pliku historii klienta.
 
-    # *books oznacza, że możemy podać dowolną liczbę argumentów (ID książek)
-    def wrapper(customer_id: str, *books):
-        print(f"\n Rozpoczynam transakcję dla klienta ID: {customer_id} ")
+    Args:
+        customer_id (str): Unikalny identyfikator klienta z bazy CSV.
+        *books (str): Dowolna liczba identyfikatorów książek (np. "B001", "B002").
 
-        # Pętla przechodzi przez wszystkie podane książki i wywołuje bazową funkcję dla każdej z nich
-        for book_id in books:
-            func(customer_id, book_id)
-
-        print("Transakcja zakończona!\n")
-
-    return wrapper
-
-
-@allow_multiple_books  # Używamy dekoratora na naszej funkcji!
-def buy_book(customer_id: str, book_id: str) -> bool:
-    """
-    Funkcja realizująca zakup pojedynczej książki.
-    Dopisuje dane o zakupie i wygaśnięciu dostępu do pliku txt klienta.
+    Returns:
+        tuple: Krotka (bool, str). Zwraca True i komunikat o sukcesie transakcji,
+               lub False i komunikat o błędzie (np. gdy klienta nie ma w bazie).
     """
     try:
-        # Sprawdzanie czy klient isnieje
+        # Sprawdzenie w głównej bazie czy gość jest zarejestrowany
         df = pd.read_csv('DATABASE/customer.csv')
-        # Zmieniamy wszystko na tekst (astype(str)), żeby uniknąć błędów przy porównywaniu.
         if str(customer_id) not in df['ID'].astype(str).values:
-            print(f"Błąd: Klient o ID {customer_id} NIE ISTNIEJE w bazie CSV. Rejestracja wymagana.")
-            return False
+            return False, f"Błąd: Klient o ID {customer_id} nie istnieje. Zarejestruj się najpierw!"
 
         file_path = f"DATABASE/{customer_id}.txt"
 
-        # Jeśli klient jest w CSV, ale nie ma swojego pliku (np. stary klient z bazy), to mu go tworzymy
+        # Tworzenie pliku dla starych klientów, jeśli go nie mają
         if not os.path.exists(file_path):
-            # Używamy 'w' aby stworzyć nową teczke dla naszego klienta
             with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(f"Historia zakupów klienta (ID: {customer_id})\n")
                 file.write(f"Plik wygenerowany przy pierwszym zakupie: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n")
                 file.write("-" * 50 + "\n")
 
-        # Właściwy zakup (dopisywanie książki do pliku)
-        # Otwieramy plik klienta w trybie 'a' (append - dopisz na końcu)
+        # Księgowanie zakupów (dopisywanie na końcu pliku txt)
         with open(file_path, 'a', encoding='utf-8') as file:
             data_zakupu = datetime.now()
-            # Zakładamy, że dostęp do e-booka wygasa po 30 dniach
             data_wygasniecia = data_zakupu + timedelta(days=30)
 
-            file.write(f"Zakupiono E-Book ID: {book_id}\n")
-            file.write(f"Data zakupu: {data_zakupu.strftime('%Y-%m-%d %H:%M')}\n")
-            file.write(f"Dostęp wygasa: {data_wygasniecia.strftime('%Y-%m-%d %H:%M')}\n")
-            file.write("-" * 50 + "\n")
+            formatowane_ksiazki = list(map(lambda x: str(x).upper(), books))
 
-        print(f"Pomyślnie dodano książkę [{book_id}] do konta klienta.")
-        return True
+            for book_id in formatowane_ksiazki:
+                file.write(f"Zakupiono E-Book ID: {book_id}\n")
+                file.write(f"Data zakupu: {data_zakupu.strftime('%Y-%m-%d %H:%M')}\n")
+                file.write(f"Dostęp wygasa: {data_wygasniecia.strftime('%Y-%m-%d %H:%M')}\n")
+                file.write("-" * 50 + "\n")
+
+        return True, "Transakcja zakończona pomyślnie! Książki dopisane do konta."
 
     except Exception as e:
-        print(f"Błąd podczas zakupu książki {book_id}: {e}")
-        return False
-
-
-
+        return False, f"Wystąpił błąd podczas dokonywania transakcji: {e}"
 # TEST ZAKUPU
 #buy_book("8909", "B001", "B015", "B042")
 
 # Logowanie użytkownika
-def login_customer(identifier: str, password: str, by_id: bool = True) -> bool:
+def login_customer(identifier: str, password: str, by_id: bool = True) -> tuple:
     """
-    Funkcja odpowiedzialna za logowanie klienta.
-    Sprawdza, czy podane ID (lub Nazwisko) i hasło zgadzają się z bazą.
+    Funkcja odpowiedzialna za logowanie klienta do systemu.
+    Weryfikuje hasło z bazą i zmienia flagę logowania w zmiennych globalnych.
+
+    Args:
+        identifier (str): ID klienta lub jego Imię i Nazwisko.
+        password (str): Hasło podane przez klienta.
+        by_id (bool, optional): Tryb szukania. True szuka po ID, False po Nazwisku. Domyślnie True.
+
+    Returns:
+        tuple: Krotka (bool, str). Zwraca True i komunikat powitalny dla poprawnego hasła,
+               lub False i komunikat o błędzie (błędne hasło/brak użytkownika).
     """
     try:
-        # Wczytujemy naszą baze danych
         df = pd.read_csv('DATABASE/customer.csv')
-        # Szukamy klienta w tabeli
+
+        # Filtrujemy Pandasem w poszukiwaniu wiersza z naszym gościem
         if by_id:
-            # Szukamy wiersza, gdzie w kolumnie ID jest wpisany nasz numerek
             user_row = df[df['ID'].astype(str) == str(identifier)]
         else:
-            # Szukamy wiersza, gdzie w kolumnie NAME jest wpisane podane nazwisko
             user_row = df[df['NAME'] == str(identifier)]
 
-        # Sprawdzamy, czy ktoś taki istnieje
+        # Jeśli wynik jest pusty, to znaczy, że takiego człowieka nie ma
         if user_row.empty:
-            print(f"Błąd logowania: Nie znaleziono użytkownika '{identifier}'.")
-            return False
+            return False, f"Błąd: Nie znaleziono użytkownika '{identifier}' w naszej bazie!"
 
-        # Wyciągamy hasło z bazy dla tego znalezionego gościa
-        # .iloc[0] oznacza, że bierzemy wartość z pierwszego wiersza
+        # Wyciągamy hasło z bazy danych
         db_password = str(user_row['PASSWORD'].iloc[0])
 
-        # KROK 4: Porównujemy hasło podane przez klienta z tym z bazy
+        # Porównanie haseł
         if str(password) == db_password:
             user_name = user_row['NAME'].iloc[0]
-            print(f"Sukces! Zalogowano pomyślnie jako: {user_name}")
 
+            # Zmieniamy status w pliku konfiguracyjnym, co pozwoli interfejsowi wejść dalej
             GlobalVariables.isLoggedIn = True
-            return True
+
+            return True, f"Udało się zalogować! Witaj ponownie, {user_name}."
 
         else:
-            print("Błąd logowania: Nieprawidłowe hasło!")
-            return False
+            # Hasło wpisane nie równa się temu w bazie
+            return False, "Błąd logowania: Podano nieprawidłowe hasło!"
 
     except FileNotFoundError:
-        print("Błąd: Brak pliku bazy (customer.csv).")
-        return False
-
+        return False, "Błąd krytyczny: Brak pliku bazy danych!"
     except Exception as e:
-        print(f"Wystąpił błąd podczas logowania: {e}")
-        return False
+        return False, f"Wystąpił nieoczekiwany błąd podczas logowania: {e}"
