@@ -2,7 +2,7 @@
 '''
 
 To do:
--kolory
+-rozmiary
 -odstępy
 -podpięcie funkcji (na koniec)
 
@@ -12,11 +12,25 @@ To do:
 import customtkinter as ctk
 import pandas as pd
 
+import AdminInterface
 import BookInterface
 import GlobalVariables
 import LoginInterface
 
+def openAdminInterface(window):
+    '''
+        Funkcja do przełączania interfejsu
 
+        Args:
+            window (tk): główne okno interfejsu
+        Returns:
+            Brak
+    '''
+
+    for widget in window.winfo_children():
+        widget.destroy()
+
+    AdminInterface.makeAdminInterface(window)
 
 def openLoginInterface(window):
     '''
@@ -63,7 +77,7 @@ def makeDashboard(window):
     '''
 
     # Pasek nagłówkowy
-    header = ctk.CTkFrame(window, fg_color="#DCDCDC", corner_radius=0, height=80)
+    header = ctk.CTkFrame(window, fg_color="#001524", corner_radius=0, height=80)
     header.pack_propagate(False) # blokowanie zmiany rozmiaru
     header.pack(side="top", fill="x")
 
@@ -73,11 +87,11 @@ def makeDashboard(window):
     appNameLabel = ctk.CTkLabel(
         header,
         text="Internetowa Księgarnia",
-        font=("arial", 16, "bold"),
-        text_color="#3498db",
-        fg_color="#DCDCDC")
+        font=("arial", 20, "bold"),
+        text_color="#3a86ff",
+        fg_color="transparent")
 
-    appNameLabel.pack(side="left", padx=10, pady=5)
+    appNameLabel.pack(side="left", padx=30, pady=10)
 
 
     # przycisk do zamykania aplikacji
@@ -89,9 +103,9 @@ def makeDashboard(window):
         width=50,
         height=50,
         fg_color="transparent",
-        text_color="#334155",
+        text_color="#3a86ff",
         hover_color="#E69A9A",
-        font=("arial", 16, "bold"),
+        font=("arial", 20, "bold"),
         command=window.destroy
     )
     closeButton.pack(side="right", padx=10, pady=5)
@@ -105,8 +119,11 @@ def makeDashboard(window):
             text="Zaloguj się",
             command= lambda x=window:openLoginInterface(x),
             fg_color="transparent",
-            text_color="#334155",
-            hover_color="#C8C8C8")
+            width=150,
+            height=50,
+            text_color="#3a86ff",
+            font=("arial", 20, "bold"),
+            hover_color="#002B4A")
 
         loginButton.pack(side="right", padx=10, pady=5)
 
@@ -117,17 +134,36 @@ def makeDashboard(window):
             text="Twój profil",
             command="",
             fg_color="transparent",
-            text_color="#334155",
-            hover_color="#C8C8C8")
+            width=150,
+            height=50,
+            text_color="#3a86ff",
+            font=("arial", 20, "bold"),
+            hover_color="#002B4A")
 
         profilButton.pack(side="right", padx=10, pady=5)
 
+    # sprawdzanie czy to admin
+    if GlobalVariables.isAdmin == True:
+        #przycisk do panelu admina
+        adminButton = ctk.CTkButton(
+            header,
+            text="Panel admina",
+            command=lambda: openAdminInterface(window),
+            fg_color="transparent",
+            width=150,
+            height=50,
+            text_color="#3a86ff",
+            font=("arial", 20, "bold"),
+            hover_color="#002B4A"
+        )
+        adminButton.pack(side="right", padx=10, pady=5)
+
     # główna sekcja dashbordu
-    mainBox =  ctk.CTkFrame(window, fg_color="#DCDCDC", corner_radius=0)
+    mainBox =  ctk.CTkScrollableFrame(window, fg_color="#001524", corner_radius=0)
     mainBox.pack(side="top", fill="both", expand=True)
 
     # dane pobrane z pliku
-    data = pd.read_excel("DATABASE/bookNew.xlsx")
+    data = pd.read_excel("DATABASE/book.xlsx")
 
     # maksymalna ilośc kolumn
     maxColumns = 4
@@ -148,15 +184,14 @@ def makeDashboard(window):
         bookFrame = ctk.CTkFrame(
             mainBox,
             width=200,
-            height=250,
-            fg_color="#FFFFFF",
-            border_color="#334155",
+            height=300,
+            fg_color="#1E293B",
+            border_color="#3B82F6",
             border_width=2,
-            corner_radius=15,
-            bg_color="#DCDCDC")
+            corner_radius=15,)
 
         bookFrame.pack_propagate(False)
-        bookFrame.grid(row=rowGrid, column=columnGrid, padx=15, pady=15, sticky="nsew")
+        bookFrame.grid(row=rowGrid, column=columnGrid, padx=25, pady=15, sticky="nsew")
 
         #tytuł
         titleLabel = ctk.CTkLabel(
@@ -164,7 +199,8 @@ def makeDashboard(window):
             text=f'Tytuł: \n{title}',
             font=("arial",12,"bold"),
             fg_color="transparent",
-            text_color="#334155")
+            wraplength=180,
+            text_color="#F8FAFC")
 
         titleLabel.pack(side="top", pady=(15, 0))
 
@@ -174,7 +210,7 @@ def makeDashboard(window):
             text=f'Autor: \n{author}',
             font=("arial",12,"bold"),
             fg_color="transparent",
-            text_color="#334155")
+            text_color="#F8FAFC")
 
         authorLabel.pack(side="top", pady=10)
 
@@ -184,7 +220,7 @@ def makeDashboard(window):
             text=f'Ilość: \n{quantity}',
             font=("arial", 12, "bold"),
             fg_color="transparent",
-            text_color="#334155")
+            text_color="#F8FAFC")
 
         quantityLabel.pack(side="top", pady=5)
 
@@ -194,11 +230,13 @@ def makeDashboard(window):
             text="Zobacz więcej",
             command=lambda  bookId=id:openBookInterface(window, bookId),
             fg_color="transparent",
-            text_color="#334155",
-            hover_color="#C8C8C8",
-            font=("arial",12,"bold"),
+            width=150,
+            height=40,
+            text_color="#F8FAFC",
+            hover_color="#1E3A8A",
+            font=("arial",16,"bold"),
             border_width=2,
-            border_color="#000000")
+            border_color="#3B82F6")
 
         buyButton.pack(side="bottom", padx=5, pady=20)
 
