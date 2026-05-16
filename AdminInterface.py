@@ -12,6 +12,7 @@ To do:
 import customtkinter as ctk
 import pandas as pd
 
+import DashboardInterface
 import LoginInterface
 
 def addBook(author,title,quantity, label):
@@ -132,7 +133,7 @@ def makeAdminInterface(window):
     profilButton = ctk.CTkButton(
         header,
         text="Twój profil",
-        command="",
+        command=lambda : DashboardInterface.openUserInterface(window),
         fg_color="transparent",
         width=150,
         height=50,

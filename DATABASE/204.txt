@@ -1,0 +1,15 @@
+Historia zakupów klienta (ID: 204)
+Plik wygenerowany przy pierwszym zakupie: 2026-05-16 19:55
+--------------------------------------------------
+Zakupiono E-Book ID: 103
+Data zakupu: 2026-05-16 19:55
+Dostęp wygasa: 2026-06-15 19:55
+--------------------------------------------------
+Zakupiono E-Book ID: 104
+Data zakupu: 2026-05-16 19:59
+Dostęp wygasa: 2026-06-15 19:59
+--------------------------------------------------
+Zakupiono E-Book ID: 104
+Data zakupu: 2026-05-16 19:59
+Dostęp wygasa: 2026-06-15 19:59
+--------------------------------------------------

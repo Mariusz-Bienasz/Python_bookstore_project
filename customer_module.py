@@ -78,6 +78,9 @@ def register_customer(name: str, surname: str, password: str, email: str = "NULL
     except Exception as e:
         return False, f"Błąd podczas zapisu do bazy danych CSV: {e}"
 
+    # Przypisanie id do zmiennej globalnej
+    GlobalVariables.userID = customer_id
+
     # REJESTRACJA UDANA! Zwracamy True oraz ładny komunikat z nowym ID
     return True, f"Rejestracja udana! Twoje nowo wygenerowane ID to: {customer_id}"
 

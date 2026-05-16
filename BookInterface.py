@@ -133,7 +133,7 @@ def makeBookInterface(window, bookId):
         profilButton = ctk.CTkButton(
             header,
             text="Twój profil",
-            command="",
+            command=lambda : DashboardInterface.openUserInterface(window),
             fg_color="transparent",
             width=150,
             height=50,

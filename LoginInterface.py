@@ -99,16 +99,15 @@ def register(name, surname, email, phone, password, passwordAgain, errorLabel):
 
 
     if error == False:
-        data = customer_module.register_customer(name,surname, password, email, phone)
-        if data != None:
+        result, message = customer_module.register_customer(name,surname, password, email, phone)
+        if result == True:
             GlobalVariables.isLoggedIn = True
-            GlobalVariables.userID = data["ID"]
-            errorLabel.configure(text="Udało ci się zarejestrować", text_color="#00FF00")
+            errorLabel.configure(text=message, text_color="#00FF00")
         else:
-            errorLabel.configure(text="Coś poszło nie tak")
+            errorLabel.configure(text=message)
 
 
-    print(f"Name: {name} \nSurname: {surname} \nEmail: {email} \nPhone: {phone} \nPassword: {password} \nPassword Again: {passwordAgain} \n")
+    #print(f"Name: {name} \nSurname: {surname} \nEmail: {email} \nPhone: {phone} \nPassword: {password} \nPassword Again: {passwordAgain} \n")
 
 def login(email, password, errorLabel):
     '''

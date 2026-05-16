@@ -16,6 +16,22 @@ import AdminInterface
 import BookInterface
 import GlobalVariables
 import LoginInterface
+import UserInterface
+
+def openUserInterface(window):
+    '''
+        Funkcja do przełączania interfejsu
+
+        Args:
+            window (tk): główne okno interfejsu
+        Returns:
+            Brak
+    '''
+
+    for widget in window.winfo_children():
+        widget.destroy()
+
+    UserInterface.makeUserInterface(window)
 
 def openAdminInterface(window):
     '''
@@ -132,7 +148,7 @@ def makeDashboard(window):
         profilButton = ctk.CTkButton(
             header,
             text="Twój profil",
-            command="",
+            command=lambda : openUserInterface(window),
             fg_color="transparent",
             width=150,
             height=50,
