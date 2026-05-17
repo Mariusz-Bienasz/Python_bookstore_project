@@ -169,81 +169,13 @@ def openDashboardInterface(window):
     # otwieranie głównego interfejsu
     DashboardInterface.makeDashboard(window)
 
-def makeLoginInterface(window):
-    '''
-        Funkcja tworząca interfejs logoawnia i rejestracji
-
-        Args:
-            window (TK): główne okno interfejsu
-        Returns:
-            brak
-    '''
-
-    # Tworzenie walidacji dla numeru telefonu
-    phoneValidate = (window.register(numbersCheck), '%P')
-
-    # Nagłówek
-    header = ctk.CTkFrame(window, fg_color="#001524", corner_radius=0, height=80)
-    header.pack_propagate(False)  # blokowanie zmiany rozmiaru
-    header.pack(side="top", fill="x")
-
-    # Napis w nagłówku
-    appNameLabel = ctk.CTkLabel(
-        header,
-        text="Internetowa Księgarnia",
-        font=("arial", 20, "bold"),
-        text_color="#3a86ff",
-        fg_color="transparent")
-
-    appNameLabel.pack(side="left", padx=30, pady=10)
-
-
-    # przycisk do zamykania aplikacji
-
-    closeButton = ctk.CTkButton(
-        header,
-        corner_radius=15,
-        text="X",
-        width=50,
-        height=50,
-        fg_color="transparent",
-        text_color="#3a86ff",
-        hover_color="#E69A9A",
-        font=("arial", 20, "bold"),
-        command=window.destroy
-    )
-    closeButton.pack(side="right", padx=10, pady=5)
-
-
-    # Przycisk powrotu do głównej strony
-
-    backButton = ctk.CTkButton(
-        header,
-        text="Powrót do sklepu",
-        command = lambda: openDashboardInterface(window),
-        fg_color="transparent",
-        width=150,
-        height=50,
-        text_color="#3a86ff",
-        font=("arial", 20, "bold"),
-        hover_color="#002B4A")
-
-    backButton.pack(side="right", padx=10, pady=5)
-
-    # główna sekcja
-    mainBox = ctk.CTkScrollableFrame(window, fg_color="#001524", corner_radius=0)
-    mainBox.pack(side="top", fill="both", expand=True)
-
-    # wrapper
-
-    wrapper = ctk.CTkFrame(mainBox, fg_color="transparent")
-    wrapper.pack(expand=True , pady=(60,30))
-
-
-    #######################################################################
-
-
+def loginForm(wrapper, loginFormButton, registerFormButton):
+    for widget in wrapper.winfo_children():
+        widget.destroy()
     ## LOGOWANIE:
+
+    loginFormButton.configure(fg_color="#1E3A8A")
+    registerFormButton.configure(fg_color="transparent")
 
     # Sekcja logowania
 
@@ -260,26 +192,25 @@ def makeLoginInterface(window):
     loginBox.pack(side="left", padx=20, pady=10)
 
     # tekst nazwy formularza (sekcji)
+
     formNameLabel = ctk.CTkLabel(
         loginBox,
         text="Logowanie",
         font=("arial", 25, "bold"),
         text_color="#F8FAFC",
         fg_color="transparent")
-
-    formNameLabel.pack(side="top", pady=(30,90))
-
+    formNameLabel.pack(side="top", pady=(30, 90))
     # napis Podaj login
+
     emailLoginLabel = ctk.CTkLabel(
         loginBox,
         text="Podaj e-mail: ",
         font=("arial", 16, "bold"),
         text_color="#F8FAFC",
         fg_color="transparent")
-
     emailLoginLabel.pack(side="top", pady=20)
-
     # input dla loginu
+
     emailLoginEntry = ctk.CTkEntry(
         loginBox,
         width=250,
@@ -290,9 +221,7 @@ def makeLoginInterface(window):
         border_width=2,
         border_color="#3B82F6",
         corner_radius=20)
-
     emailLoginEntry.pack(side="top")
-
     # napis Podaj hasło
 
     passwordLabel = ctk.CTkLabel(
@@ -301,9 +230,7 @@ def makeLoginInterface(window):
         font=("arial", 16, "bold"),
         text_color="#F8FAFC",
         fg_color="transparent")
-
     passwordLabel.pack(side="top", pady=20)
-
     # input dla hasła
 
     passwordEntry = ctk.CTkEntry(
@@ -317,11 +244,9 @@ def makeLoginInterface(window):
         border_width=2,
         border_color="#3B82F6",
         corner_radius=20)
-
     passwordEntry.pack(side="top")
 
     # przycisk logowania
-
     loginButton = ctk.CTkButton(
         loginBox,
         text="Zaloguj!",
@@ -334,22 +259,38 @@ def makeLoginInterface(window):
         text_color="#F8FAFC",
         fg_color="transparent",
         font=("arial", 20, "bold"),
-        command = lambda: login(emailLoginEntry.get(), passwordEntry.get(), errorLabel))
-
+        command=lambda: login(emailLoginEntry.get(), passwordEntry.get(), errorLabel))
     loginButton.pack(side="top", pady=70)
 
+    # Label do wyświetlania błędów
 
+    errorLabel = ctk.CTkLabel(
+        loginBox,
+        text="",
+        font=("arial", 16, "bold"),
+        text_color="#d62828",
+        fg_color="transparent"
+    )
 
+    errorLabel.pack(side="bottom", pady=30)
 
-    ################################################################################
+    #############################################
 
-
+def registerForm(wrapper, loginFormButton, registerFormButton):
+    for widget in wrapper.winfo_children():
+        widget.destroy()
 
     ## REJESTRACJA:
 
+    loginFormButton.configure(fg_color="transparent")
+    registerFormButton.configure(fg_color="#1E3A8A")
+
+    # Tworzenie walidacji dla numeru telefonu
+    phoneValidate = (wrapper.register(numbersCheck), '%P')
+
     # Sekcja rejsetracji:
 
-    registerBox = ctk.CTkFrame(
+    registerBox = ctk.CTkScrollableFrame(
         wrapper,
         width=350,
         height=750,
@@ -358,8 +299,8 @@ def makeLoginInterface(window):
         border_color="#3B82F6",
         fg_color="#1E293B")
 
-    registerBox.pack_propagate(False)
     registerBox.pack(side="left", padx=20, pady=10)
+    registerBox._scrollbar.grid_configure(padx=(0, 10))
 
     # Tekst 'Rejestracja'
 
@@ -537,6 +478,18 @@ def makeLoginInterface(window):
 
     passwordAgainRegisterEntry.pack(side="top")
 
+    # Label do wyświetlania błędów
+
+    errorLabel = ctk.CTkLabel(
+        registerBox,
+        text="",
+        font=("arial", 16, "bold"),
+        text_color="#d62828",
+        fg_color="transparent"
+    )
+
+    errorLabel.pack(side="bottom", pady=30)
+
     # przycisk rejestracji
 
     registerButton = ctk.CTkButton(
@@ -561,19 +514,122 @@ def makeLoginInterface(window):
             errorLabel)
     )
 
-    registerButton.pack(side="bottom", pady=(0,30))
+    registerButton.pack(side="bottom", pady=(30,15))
 
 
-    # Label do wyświetlania błędów
 
-    errorLabel = ctk.CTkLabel(
-        mainBox,
-        text="",
-        font=("arial", 16, "bold"),
-        text_color="#d62828",
-        fg_color="transparent"
+def makeLoginInterface(window):
+    '''
+        Funkcja tworząca interfejs logoawnia i rejestracji
+
+        Args:
+            window (TK): główne okno interfejsu
+        Returns:
+            brak
+    '''
+
+    # Nagłówek
+    header = ctk.CTkFrame(window, fg_color="#001524", corner_radius=0, height=80)
+    header.pack_propagate(False)  # blokowanie zmiany rozmiaru
+    header.pack(side="top", fill="x")
+
+    # Napis w nagłówku
+    appNameLabel = ctk.CTkLabel(
+        header,
+        text="Internetowa Księgarnia",
+        font=("arial", 20, "bold"),
+        text_color="#3a86ff",
+        fg_color="transparent")
+
+    appNameLabel.pack(side="left", padx=30, pady=10)
+
+
+    # przycisk do zamykania aplikacji
+
+    closeButton = ctk.CTkButton(
+        header,
+        corner_radius=15,
+        text="X",
+        width=50,
+        height=50,
+        fg_color="transparent",
+        text_color="#3a86ff",
+        hover_color="#E69A9A",
+        font=("arial", 20, "bold"),
+        command=window.destroy
+    )
+    closeButton.pack(side="right", padx=10, pady=5)
+
+
+    # Przycisk powrotu do głównej strony
+
+    backButton = ctk.CTkButton(
+        header,
+        text="Powrót do sklepu",
+        command = lambda: openDashboardInterface(window),
+        fg_color="transparent",
+        width=150,
+        height=50,
+        text_color="#3a86ff",
+        font=("arial", 20, "bold"),
+        hover_color="#002B4A")
+
+    backButton.pack(side="right", padx=10, pady=5)
+
+    buttonsWrapper = ctk.CTkFrame(window, fg_color="#001524", corner_radius=0)
+    buttonsWrapper.pack(side="top", fill="x", )
+
+    buttonBox = ctk.CTkFrame(
+        buttonsWrapper,
+        fg_color="#001524",
+        height=100,
+        width=700,
     )
 
-    errorLabel.pack(side="bottom", pady=30)
+    buttonBox.pack(side="top", pady=0)
 
+    mainBox = ctk.CTkScrollableFrame(window, fg_color="#001524", corner_radius=0)
+    mainBox.pack(side="top", fill="both", expand=True)
+
+    loginFormButton = ctk.CTkButton(
+        buttonBox,
+        text="LOGOWANIE",
+        command=lambda: loginForm(wrapper, loginFormButton, registerFormButton),
+        width=200,
+        height=40,
+        border_width=2,
+        corner_radius=10,
+        border_color="#3B82F6",
+        hover_color="#1E3A8A",
+        text_color="#F8FAFC",
+        fg_color="transparent",
+        font=("arial", 20, "bold"),
+    )
+
+    loginFormButton.pack(side="left", padx=(0, 50))
+
+    registerFormButton = ctk.CTkButton(
+        buttonBox,
+        text="REJESTRACJA",
+        command=lambda: registerForm(wrapper, loginFormButton, registerFormButton),
+        width=200,
+        height=40,
+        border_width=2,
+        corner_radius=10,
+        border_color="#3B82F6",
+        hover_color="#1E3A8A",
+        text_color="#F8FAFC",
+        fg_color="transparent",
+        font=("arial", 20, "bold"),
+    )
+
+
+    registerFormButton.pack(side="left", padx=(0,0))
+
+    # wrapper
+
+    wrapper = ctk.CTkFrame(mainBox, fg_color="transparent")
+    wrapper.pack(expand=True , pady=(60,30))
+
+    loginForm(wrapper, loginFormButton, registerFormButton)
 

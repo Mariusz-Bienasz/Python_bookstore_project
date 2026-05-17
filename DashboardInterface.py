@@ -16,6 +16,7 @@ import AdminInterface
 import BookInterface
 import GlobalVariables
 import LoginInterface
+import RatingSystem
 import UserInterface
 
 def openUserInterface(window):
@@ -212,37 +213,51 @@ def makeDashboard(window):
         #tytuł
         titleLabel = ctk.CTkLabel(
             bookFrame,
+            anchor="center",
             text=f'Tytuł: \n{title}',
-            font=("arial",12,"bold"),
+            font=("arial",14,"bold"),
             fg_color="transparent",
             wraplength=180,
             text_color="#F8FAFC")
 
-        titleLabel.pack(side="top", pady=(15, 0))
+        titleLabel.pack(side="top", pady=(20, 0))
 
         # autor
         authorLabel = ctk.CTkLabel(
             bookFrame,
+            anchor="center",
             text=f'Autor: \n{author}',
-            font=("arial",12,"bold"),
+            font=("arial",14,"bold"),
             fg_color="transparent",
             text_color="#F8FAFC")
 
-        authorLabel.pack(side="top", pady=10)
+        authorLabel.pack(side="top", pady=(20,0))
 
         # ilość
         quantityLabel = ctk.CTkLabel(
             bookFrame,
+            anchor="center",
             text=f'Ilość: \n{quantity}',
-            font=("arial", 12, "bold"),
+            font=("arial", 14, "bold"),
             fg_color="transparent",
             text_color="#F8FAFC")
 
-        quantityLabel.pack(side="top", pady=5)
+        quantityLabel.pack(side="top", pady=(20,0))
+
+        rateLabel = ctk.CTkLabel(
+            bookFrame,
+            anchor="center",
+            text=f'Ocena: \n{RatingSystem.getMeanRate(id)}',
+            font=("arial", 14, "bold"),
+            fg_color="transparent",
+            text_color="#F8FAFC")
+
+        rateLabel.pack(side="top", pady=(20,0))
 
         # przycisk kup
         buyButton = ctk.CTkButton(
             bookFrame,
+            anchor="center",
             text="Zobacz więcej",
             command=lambda  bookId=id:openBookInterface(window, bookId),
             fg_color="transparent",

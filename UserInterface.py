@@ -12,6 +12,14 @@ import customer_module
 
 
 def deleteAccount(window):
+    '''
+        Funkcja do podpięcia usuwania konta
+
+        Arg:
+            window: główne okno aplikacji
+        Return:
+            Brak
+    '''
     result, message = customer_module.delete_customer(str(GlobalVariables.userID),True)
     if result == True:
         GlobalVariables.isLoggedIn = False
@@ -19,6 +27,13 @@ def deleteAccount(window):
         DashboardInterface.makeDashboard(window)
 
 def getAddress():
+    '''
+        Funkcja do pobierania adresów z bazy
+        Arg:
+            Brak
+        Return:
+            Brak
+    '''
     data = pd.read_csv("DATABASE/address.csv")
     addressRow = data[data['ID'].astype(str) == str(GlobalVariables.userID)]
     address = {}
@@ -29,6 +44,13 @@ def getAddress():
     return address
 
 def getBookName(bookId):
+    '''
+        Funkcja do pobierania tytułu książki z bazy po id
+        Arg:
+            bookId: id książki
+        Return:
+            tytuł książki lub komunikat
+    '''
     try:
         data = pd.read_excel("DATABASE/book.xlsx")
         book = data[data['ID'].astype(str) == str(bookId)]
@@ -42,6 +64,14 @@ def getBookName(bookId):
 
 
 def readBuyHistory():
+    '''
+        Funkcja do odczytywania histori zakupów z pliku
+
+        Arg:
+            Brak
+        Return:
+            purchases: słowinik trzymający id,data zakupu i data wygaśnięcia ksiażek
+    '''
     filePath = f"DATABASE/{str(GlobalVariables.userID)}.txt"
     purchases = []
 
@@ -73,11 +103,21 @@ def readBuyHistory():
 
 #######################################
 
-def buyHistory(mainBox):
+def buyHistory(mainBox, historyButton, adressButton):
+    '''
+        Funkcja do budowania historii zakupów
+
+        Arg:
+            mainBox: sekcja w której ma sie utworzyć historia zakupów
+        Return:
+            Brak
+    '''
 
     for widget in mainBox.winfo_children():
         widget.destroy()
 
+    historyButton.configure(fg_color="#1E3A8A")
+    adressButton.configure(fg_color="transparent")
 
     historyBox = ctk.CTkScrollableFrame(
         mainBox,
@@ -172,10 +212,20 @@ def buyHistory(mainBox):
 
 ########################################
 
-def address(mainBox):
+def address(mainBox, historyButton, adressButton):
+    '''
+        Funkcja do budowania info o adresie
 
+        Arg:
+            mainBox: sekcja w której ma sie utworzyć historia zakupów
+        Return:
+            Brak
+    '''
     for widget in mainBox.winfo_children():
         widget.destroy()
+
+    historyButton.configure(fg_color="transparent")
+    adressButton.configure(fg_color="#1E3A8A")
 
 
     addressBox = ctk.CTkFrame(
@@ -386,7 +436,7 @@ def makeUserInterface(window):
     historyButton = ctk.CTkButton(
         buttonBox,
         text="HISTORIA ZAKUPÓW",
-        command=lambda :buyHistory(mainBox),
+        command=lambda :buyHistory(mainBox, historyButton, adressButton),
         width=200,
         height=40,
         border_width=2,
@@ -403,7 +453,7 @@ def makeUserInterface(window):
     adressButton = ctk.CTkButton(
         buttonBox,
         text="ADRES",
-        command=lambda : address(mainBox),
+        command=lambda : address(mainBox, historyButton, adressButton),
         width=200,
         height=40,
         border_width=2,
@@ -436,4 +486,4 @@ def makeUserInterface(window):
 
     #################################
 
-    buyHistory(mainBox)
+    buyHistory(mainBox, historyButton, adressButton)

@@ -83,89 +83,19 @@ def searchId(bookId, data, labels, entry):
             labels[i].configure(text=headers[i] + "---")
 
 
-def makeAdminInterface(window):
-    '''
-        funkcja tworzy interfejs panelu admina, (opcja dodawania i usuwania książęk)
-        Args:
-            window (TK): główne okno interfejsu
-        Returns:
-            brak
-    '''
+#################################################
 
+def deleteForm(mainBox, deleteFormButton, addFormButton):
+    for widget in mainBox.winfo_children():
+        widget.destroy()
 
-    idInputValidate = (window.register(LoginInterface.numbersCheck), '%P')
+    ## REJESTRACJA:
 
-    # Pasek nagłówkowy
-    header = ctk.CTkFrame(window, fg_color="#001524", corner_radius=0, height=80)
-    header.pack_propagate(False)  # blokowanie zmiany rozmiaru
-    header.pack(side="top", fill="x")
-
-    # Napis w nagłówku
-
-    appNameLabel = ctk.CTkLabel(
-        header,
-        text="Internetowa Księgarnia",
-        font=("arial", 20, "bold"),
-        text_color="#3a86ff",
-        fg_color="transparent")
-
-    appNameLabel.pack(side="left", padx=30, pady=10)
-
-    # przycisk do zamykania aplikacji
-
-    closeButton = ctk.CTkButton(
-        header,
-        corner_radius=15,
-        text="X",
-        width=50,
-        height=50,
-        fg_color="transparent",
-        text_color="#3a86ff",
-        hover_color="#E69A9A",
-        font=("arial", 20, "bold"),
-        command=window.destroy
-    )
-    closeButton.pack(side="right", padx=10, pady=5)
-
-
-    # przycisk do panelu urzytkownika
-
-    profilButton = ctk.CTkButton(
-        header,
-        text="Twój profil",
-        command=lambda : DashboardInterface.openUserInterface(window),
-        fg_color="transparent",
-        width=150,
-        height=50,
-        text_color="#3a86ff",
-        font=("arial", 20, "bold"),
-        hover_color="#002B4A")
-    profilButton.pack(side="right", padx=10, pady=5)
-
-
-    # Przycisk powrotu do głównej strony
-
-    backButton = ctk.CTkButton(
-        header,
-        text="Powrót do sklepu",
-        command=lambda: LoginInterface.openDashboardInterface(window),
-        fg_color="transparent",
-        width=150,
-        height=50,
-        text_color="#3a86ff",
-        font=("arial", 20, "bold"),
-        hover_color="#002B4A")
-
-    backButton.pack(side="right", padx=10, pady=5)
-
-
-    # Główna sekcja:
-
-    mainBox = ctk.CTkScrollableFrame(window, fg_color="#001524", corner_radius=0)
-    mainBox.pack(side="top", fill="both", expand=True)
-
+    deleteFormButton.configure(fg_color="#1E3A8A")
+    addFormButton.configure(fg_color="transparent")
 
     #   Sekcja usuwania książek
+    idInputValidate = (mainBox.register(LoginInterface.numbersCheck), '%P')
 
     deleteBox = ctk.CTkFrame(
         mainBox,
@@ -178,8 +108,7 @@ def makeAdminInterface(window):
     )
 
     deleteBox.pack_propagate(False)
-    deleteBox.pack(side="top", padx=20, pady=(100,0))
-
+    deleteBox.pack(side="top", padx=20, pady=(100, 0))
 
     # Nazwa formularza
 
@@ -187,9 +116,9 @@ def makeAdminInterface(window):
         deleteBox,
         text="------------ Usuń książkę ------------",
         anchor="center",
-        font = ("arial", 20, "bold"),
-        text_color = "#F8FAFC",
-        fg_color = "transparent"
+        font=("arial", 20, "bold"),
+        text_color="#F8FAFC",
+        fg_color="transparent"
     )
     formNameLabel.pack(side="top", pady=30)
 
@@ -199,19 +128,18 @@ def makeAdminInterface(window):
         deleteBox,
         text="Podaj numer książki: ",
         anchor="center",
-        font = ("arial", 20, "bold"),
-        text_color = "#F8FAFC",
-        fg_color = "transparent"
+        font=("arial", 20, "bold"),
+        text_color="#F8FAFC",
+        fg_color="transparent"
     )
 
     idInputLabel.pack(side="top", pady=20)
 
-    idBox = ctk.CTkFrame(deleteBox,fg_color="transparent")
+    idBox = ctk.CTkFrame(deleteBox, fg_color="transparent")
     idBox.pack(side="top")
 
     #########################
     # sekcja informacji wybranej książki
-
 
     infoBox = ctk.CTkFrame(
         deleteBox,
@@ -219,7 +147,6 @@ def makeAdminInterface(window):
 
     )
     infoBox.pack(side="top", pady=40)
-
 
     # lewa strona sekcji
 
@@ -245,8 +172,7 @@ def makeAdminInterface(window):
 
     authorLabel.pack(side="top")
 
-
-    #tytuł
+    # tytuł
 
     titleLabel = ctk.CTkLabel(
         leftSideBox,
@@ -262,7 +188,6 @@ def makeAdminInterface(window):
 
     titleLabel.pack(side="top", pady=(10, 0))
 
-
     # środkowa strona sekcji
 
     midleSideBox = ctk.CTkFrame(
@@ -270,7 +195,6 @@ def makeAdminInterface(window):
         fg_color="transparent"
     )
     midleSideBox.pack(side="left", padx=10)
-
 
     # ilość
 
@@ -288,8 +212,7 @@ def makeAdminInterface(window):
 
     quantityLabel.pack(side="top")
 
-
-    #data utworzenia
+    # data utworzenia
 
     createdLabel = ctk.CTkLabel(
         midleSideBox,
@@ -305,7 +228,6 @@ def makeAdminInterface(window):
 
     createdLabel.pack(side="top", pady=(10, 0))
 
-
     # prawa strona sekcji
 
     rightSideBox = ctk.CTkFrame(
@@ -313,7 +235,6 @@ def makeAdminInterface(window):
         fg_color="transparent"
     )
     rightSideBox.pack(side="left", padx=10)
-
 
     # data aktualizacji
 
@@ -331,11 +252,9 @@ def makeAdminInterface(window):
 
     updatedLabel.pack(side="top")
 
-
     # lista labelów książki
 
     bookInfoLabels = [authorLabel, titleLabel, quantityLabel, createdLabel, updatedLabel]
-
 
     #########################
 
@@ -343,16 +262,15 @@ def makeAdminInterface(window):
 
     data = pd.read_excel("DATABASE/book.xlsx")
 
-    #wszystkie id książek
-    allId= data['ID'].astype(str).tolist()
+    # wszystkie id książek
+    allId = data['ID'].astype(str).tolist()
 
-
-    #rozwijana lista z id
+    # rozwijana lista z id
 
     idInputMenu = ctk.CTkOptionMenu(
         idBox,
         values=allId,
-        command= lambda id: searchId(id,data,bookInfoLabels, idInputEntry),
+        command=lambda id: searchId(id, data, bookInfoLabels, idInputEntry),
         font=("arial", 16, "bold"),
         anchor="center",
         fg_color="#1E293B",
@@ -368,7 +286,6 @@ def makeAdminInterface(window):
     idInputMenu.pack(side="left", pady=0, padx=30)
     idInputMenu.set("Wybierz id")
 
-
     # przycisk szukaj
 
     idSearchButton = ctk.CTkButton(
@@ -376,7 +293,7 @@ def makeAdminInterface(window):
         text="Szukaj",
         width=40,
         height=40,
-        command=lambda: searchId(idInputEntry.get(),data,bookInfoLabels, idInputEntry),
+        command=lambda: searchId(idInputEntry.get(), data, bookInfoLabels, idInputEntry),
         anchor="center",
         text_color="#F8FAFC",
         font=("arial", 16, "bold"),
@@ -388,7 +305,6 @@ def makeAdminInterface(window):
     )
 
     idSearchButton.pack(side="right", pady=0, padx=0)
-
 
     # input id książki
 
@@ -409,8 +325,7 @@ def makeAdminInterface(window):
         validatecommand=idInputValidate
     )
 
-    idInputEntry.pack(side="right", pady=0, padx=(30,10))
-
+    idInputEntry.pack(side="right", pady=0, padx=(30, 10))
 
     # miejsce na wypisywanie błędów
 
@@ -443,13 +358,19 @@ def makeAdminInterface(window):
 
     deleteButton.pack(side="top", pady=(50, 0))
 
+#################################################
 
-    ##############################################################
-    #
-    #     Sekcja dodawania książki
-    #
-    ##############################################################
 
+################################################
+
+def addForm(mainBox, deleteFormButton, addFormButton):
+    for widget in mainBox.winfo_children():
+        widget.destroy()
+
+    deleteFormButton.configure(fg_color="transparent")
+    addFormButton.configure(fg_color="#1E3A8A")
+
+    idInputValidate = (mainBox.register(LoginInterface.numbersCheck), '%P')
 
     addBox = ctk.CTkFrame(
         mainBox,
@@ -628,3 +549,133 @@ def makeAdminInterface(window):
     )
 
     errorAddLabel.pack(side="bottom", pady=(0,40))
+
+#################################################
+
+
+
+def makeAdminInterface(window):
+    '''
+        funkcja tworzy interfejs panelu admina, (opcja dodawania i usuwania książęk)
+        Args:
+            window (TK): główne okno interfejsu
+        Returns:
+            brak
+    '''
+
+
+    # Pasek nagłówkowy
+    header = ctk.CTkFrame(window, fg_color="#001524", corner_radius=0, height=80)
+    header.pack_propagate(False)  # blokowanie zmiany rozmiaru
+    header.pack(side="top", fill="x")
+
+    # Napis w nagłówku
+
+    appNameLabel = ctk.CTkLabel(
+        header,
+        text="Internetowa Księgarnia",
+        font=("arial", 20, "bold"),
+        text_color="#3a86ff",
+        fg_color="transparent")
+
+    appNameLabel.pack(side="left", padx=30, pady=10)
+
+    # przycisk do zamykania aplikacji
+
+    closeButton = ctk.CTkButton(
+        header,
+        corner_radius=15,
+        text="X",
+        width=50,
+        height=50,
+        fg_color="transparent",
+        text_color="#3a86ff",
+        hover_color="#E69A9A",
+        font=("arial", 20, "bold"),
+        command=window.destroy
+    )
+    closeButton.pack(side="right", padx=10, pady=5)
+
+
+    # przycisk do panelu urzytkownika
+
+    profilButton = ctk.CTkButton(
+        header,
+        text="Twój profil",
+        command=lambda : DashboardInterface.openUserInterface(window),
+        fg_color="transparent",
+        width=150,
+        height=50,
+        text_color="#3a86ff",
+        font=("arial", 20, "bold"),
+        hover_color="#002B4A")
+    profilButton.pack(side="right", padx=10, pady=5)
+
+
+    # Przycisk powrotu do głównej strony
+
+    backButton = ctk.CTkButton(
+        header,
+        text="Powrót do sklepu",
+        command=lambda: LoginInterface.openDashboardInterface(window),
+        fg_color="transparent",
+        width=150,
+        height=50,
+        text_color="#3a86ff",
+        font=("arial", 20, "bold"),
+        hover_color="#002B4A")
+
+    backButton.pack(side="right", padx=10, pady=5)
+
+
+
+    buttonsWrapper = ctk.CTkFrame(window, fg_color="#001524", corner_radius=0)
+    buttonsWrapper.pack(side="top", fill="x", )
+
+    buttonBox = ctk.CTkFrame(
+        buttonsWrapper,
+        fg_color="#001524",
+        height=100,
+        width=700,
+    )
+
+    buttonBox.pack(side="top", pady=0)
+
+    mainBox = ctk.CTkScrollableFrame(window, fg_color="#001524", corner_radius=0)
+    mainBox.pack(side="top", fill="both", expand=True)
+
+    deleteFormButton = ctk.CTkButton(
+        buttonBox,
+        text="LOGOWANIE",
+        command=lambda: deleteForm(mainBox, deleteFormButton, addFormButton),
+        width=200,
+        height=40,
+        border_width=2,
+        corner_radius=10,
+        border_color="#3B82F6",
+        hover_color="#1E3A8A",
+        text_color="#F8FAFC",
+        fg_color="transparent",
+        font=("arial", 20, "bold"),
+    )
+
+    deleteFormButton.pack(side="left", padx=(0, 50))
+
+    addFormButton = ctk.CTkButton(
+        buttonBox,
+        text="REJESTRACJA",
+        command=lambda: addForm(mainBox, deleteFormButton, addFormButton),
+        width=200,
+        height=40,
+        border_width=2,
+        corner_radius=10,
+        border_color="#3B82F6",
+        hover_color="#1E3A8A",
+        text_color="#F8FAFC",
+        fg_color="transparent",
+        font=("arial", 20, "bold"),
+    )
+
+    addFormButton.pack(side="left", padx=(0, 0))
+
+    deleteForm(mainBox, deleteFormButton, addFormButton)

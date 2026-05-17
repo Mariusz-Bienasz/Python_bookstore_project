@@ -14,11 +14,20 @@ from PIL import Image
 import GlobalVariables
 import DashboardInterface
 import LoginInterface
+import RatingSystem
 import customer_module
 
 
-def setRating(rate, bookId, userId):
-    print(f"Rate: {rate} \nBook id: {bookId} \nUser id: {userId}")
+def setRating(rate, bookId, errorLabel):
+    if GlobalVariables.isLoggedIn == True:
+        result , message = RatingSystem.setRating(bookId,rate)
+        if result == True:
+            errorLabel.configure(text=message, text_color="#00FF00")
+        else:
+            errorLabel.configure(text=message)
+        print(f"Rate: {rate} \nBook id: {bookId} Message: {message}")
+    else:
+        errorLabel.configure(text="Muszisz być zalogowany aby dodać ocene")
 
 def buyBook(bookId, quantity, errorLabel):
     print(GlobalVariables.userID)
@@ -198,7 +207,7 @@ def makeBookInterface(window, bookId):
         fg_color="#1E293B",
         border_color="#3B82F6",
         width=900,
-        height=500)
+        height=550)
 
     bookBox.pack_propagate(False)
     bookBox.pack(side="top", pady=100)
@@ -256,6 +265,14 @@ def makeBookInterface(window, bookId):
 
     authorLabel.pack(side="top", pady=20)
 
+    rateLabel = ctk.CTkLabel(
+        bookInfoBox,
+        text=f"Ocena: \n{RatingSystem.getMeanRate(bookId)}",
+        text_color="#F8FAFC",
+        font=("arial", 16, "bold"))
+
+    rateLabel.pack(side="top", pady=(10,5))
+
     # skala occen
     ratingOptions = ["1","2","3","4","5"]
 
@@ -273,7 +290,7 @@ def makeBookInterface(window, bookId):
     ratingMenu = ctk.CTkOptionMenu(
         bookInfoBox,
         values=ratingOptions,
-        command=lambda rate: setRating(rate,bookId,GlobalVariables.userID),
+        command=lambda rate: setRating(rate,bookId, errorLabel),
         font=("arial", 16, "bold"),
         anchor="center",
         fg_color="#1E293B",
@@ -287,7 +304,7 @@ def makeBookInterface(window, bookId):
     )
 
     ratingMenu.pack(side="top", pady=0)
-    ratingMenu.set("Wybierz ocenę")
+    ratingMenu.set(RatingSystem.getMyRate(bookId))
 
     #sekcja kupna książki
 
@@ -355,16 +372,7 @@ def makeBookInterface(window, bookId):
     quantityAddButton.pack_propagate(False)
     quantityAddButton.pack(side="left", padx=5, pady=5)
 
-    errorLabel = ctk.CTkLabel(
-        mainBox,
-        text="",
-        anchor="center",
-        font=("arial", 16, "bold"),
-        text_color="#d62828",
-        fg_color="transparent"
-    )
 
-    errorLabel.pack(side="bottom", pady=100)
 
 
     buyButton = ctk.CTkButton(
@@ -393,4 +401,16 @@ def makeBookInterface(window, bookId):
         font=("arial", 16, "bold"))
 
     quantityLabel.pack(side="top", pady=20)
+
+    errorLabel = ctk.CTkLabel(
+        bookBox,
+        text="",
+        width=200,
+        anchor="center",
+        font=("arial", 16, "bold"),
+        text_color="#d62828",
+        fg_color="transparent"
+    )
+
+    errorLabel.pack(side="bottom", pady=(0,30), padx=(20,0))
 
